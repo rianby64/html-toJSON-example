@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="resources/testharness.js/testharness.css" rel="stylesheet">
+    <script src="resources/testharness.js/testharness.js"></script>
+    <script src="toJSON.js"></script>
+  </head>
+  <body>
+    <form id="case1">
+      <input name='highlander[]' value='one'>
+    </form>
+    <form id="case2">
+      <input name='key1' value='a'>
+      <input name='key2' value='b'>
+      <input name='key3' value='c'>
+    </form>
+    <form id="case3">
+      <input name='key1' value='a'>
+      <input name='key2' value='b'>
+      <input name='key2' value='c'>
+      <input name='key2' value='d'>
+    </form>
+  </body>
+  <script> // ----------- TESTS -------------
+
+    var case1 = async_test('Process a single input[type="text"]');
+    var form1 = document.querySelector('form#case1');
+    form1.addEventListener('submit', case1.step_func(e => {
+      e.preventDefault();
+      var fd = new FormData(e.target);
+
+      var expected = {
+        'highlander[]': 'one'
+      };
+      var actual = fd.toJSON();
+
+      // Please, advice me how to assert two objects :(
+      for (var item in actual) {
+        assert_equals(actual[item], expected[item]);
+      }
+
+      case1.done();
+    }));
+    form1.dispatchEvent(new Event('submit'));
+
+
+    var case2 = async_test('Process multiple input[type="text"]');
+    var form2 = document.querySelector('form#case2');
+    form2.addEventListener('submit', case2.step_func(e => {
+      e.preventDefault();
+      var fd = new FormData(e.target);
+
+      var expected = {
+        'key1': 'a',
+        'key2': 'b',
+        'key3': 'c'
+      };
+      var actual = fd.toJSON();
+
+      // Please, advice me how to assert two objects :(
+      for (var item in actual) {
+        assert_equals(actual[item], expected[item]);
+      }
+
+      case2.done();
+    }));
+    form2.dispatchEvent(new Event('submit'));
+
+
+    var case3 = async_test('Process multiple input[type="text"] with same name');
+    var form3 = document.querySelector('form#case3');
+    form3.addEventListener('submit', case3.step_func(e => {
+      e.preventDefault();
+      var fd = new FormData(e.target);
+
+      var expected = {
+        'key1': 'a',
+        'key2': ['b', 'c', 'd']
+      };
+      var actual = fd.toJSON();
+
+      assert_equals(actual['key1'], expected['key1']);
+      assert_array_equals(actual['key2'], expected['key2']);
+
+      case3.done();
+    }));
+    form3.dispatchEvent(new Event('submit'));
+
+  </script>
+</html>

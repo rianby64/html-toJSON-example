@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <script src="toJSON.js"></script>
+  <body>
+    <form>
+      <input type='file' name='file' multiple>
+      <input type='submit'>
+    </form>
+  </body>
+  <script> // ----------- TEST -------------
+    /*
+       I'm not sure how to test an input[type="file"]
+       Please, give me more time to read about that
+    */
+    var form = document.querySelector('form');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      var fd = new FormData(e.target);
+      console.log(fd.toJSON());
+    });
+    form.dispatchEvent(new Event('submit'));
+  </script>
+</html>
